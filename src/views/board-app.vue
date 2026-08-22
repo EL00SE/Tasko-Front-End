@@ -38,6 +38,24 @@
       ></group-list>
     </section>
 
+    <section v-if="!board" class="boards-home">
+      <h2>Your boards</h2>
+      <div v-if="boards.length" class="boards-home-grid">
+        <div
+          v-for="b in boards"
+          :key="b._id"
+          class="boards-home-card"
+          :style="boardCardStyle(b)"
+          @click="goToBoard(b)"
+        >
+          <span>{{ b.title }}</span>
+        </div>
+      </div>
+      <p v-else class="boards-home-empty">
+        You don't have any boards yet. Click <strong>Create</strong> above to make your first one.
+      </p>
+    </section>
+
     <section v-if="isCardOpen" class="dialog-container card-details-scroll">
       <card-details
         ref="cardDetailsModal"
@@ -209,10 +227,21 @@ export default {
       this.newActivity = boardService.getEmptyActivity()
       this.$store.dispatch({ type: "saveBoard", board })
     },
+    goToBoard(board) {
+      this.$router.push(`/board/${board._id}`)
+    },
+    boardCardStyle(board) {
+      return board.backgroundPhoto
+        ? { backgroundImage: `url(${board.backgroundPhoto})` }
+        : { backgroundColor: board.background || "#0079BF" }
+    },
   },
   computed: {
     board() {
       return this.$store.getters.board
+    },
+    boards() {
+      return this.$store.getters.boards || []
     },
     cardToShow() {
       if (!this.board || this.selectedCardGroupIdx === null || this.selectedCardIdx === null) return null
@@ -248,6 +277,34 @@ export default {
   padding: 16px;
   display: flex;
   flex-direction: column;
+}
+.boards-home {
+  padding: 24px;
+}
+.boards-home h2 {
+  margin-bottom: 16px;
+  font-size: 16px;
+}
+.boards-home-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+  gap: 12px;
+}
+.boards-home-card {
+  height: 90px;
+  border-radius: 6px;
+  background-size: cover;
+  background-position: center;
+  display: flex;
+  align-items: flex-end;
+  padding: 10px;
+  cursor: pointer;
+  color: #fff;
+  font-weight: 600;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);
+}
+.boards-home-empty {
+  color: #6b7785;
 }
 .dialog-container {
   position: fixed;

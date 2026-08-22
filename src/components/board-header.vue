@@ -75,11 +75,11 @@
                 <!-- <div class="users-avatar">{{ setMemberLetters(board.createdBy.fullname) }}</div> -->
                 <img
                     class="admin-avatar"
-                    v-if="board.createdBy.imgUrl"
+                    v-if="board.createdBy?.imgUrl"
                     :src="board.createdBy.imgUrl"
                     alt
                 />
-                <div v-else class="user-avatar">{{ setMemberLetters(board.createdBy.fullname) }}</div>
+                <div v-else class="user-avatar">{{ board.createdBy?.fullname ? setMemberLetters(board.createdBy.fullname) : '' }}</div>
                 <img
                     class="admin-img"
                     src="https://a.trellocdn.com/prgb/dist/images/chevron.88a4454280d68a816b89.png"
@@ -105,7 +105,7 @@
 
             <remove-user-modal
                 :style="{ 'top': '90' + 'px', 'left': pos.left + 'px' }"
-                v-if="removeUser && loggedinUser._id === board.createdBy._id"
+                v-if="removeUser && loggedinUser?._id && loggedinUser._id === board.createdBy?._id"
                 @close="closeRemoveUser"
                 v-clickOutside="closeRemoveUser"
                 :currUser="currUser"
@@ -120,7 +120,7 @@
             </a>
 
             <!-- invite modal start -->
-            <div v-if="loggedinUser._id === board.createdBy._id" id="modal1" class="overlay">
+            <div v-if="loggedinUser?._id && loggedinUser._id === board.createdBy?._id" id="modal1" class="overlay">
                 <a class="cancel" href="#"></a>
                 <div class="invite-modal-container">
                     <div class="invite-modal">
@@ -163,15 +163,15 @@
                                 <div class="admin-avatar-name">
                                     <img
                                         class="member-avatar"
-                                        v-if="board.createdBy.imgUrl"
+                                        v-if="board.createdBy?.imgUrl"
                                         :src="board.createdBy.imgUrl"
                                         alt
                                     />
                                     <div
                                         v-else
                                         class="admin-avatar member"
-                                    >{{ setMemberLetters(board.createdBy.fullname) }}</div>
-                                    <p>{{ board.createdBy.fullname }}</p>
+                                    >{{ board.createdBy?.fullname ? setMemberLetters(board.createdBy.fullname) : '' }}</div>
+                                    <p>{{ board.createdBy?.fullname }}</p>
                                 </div>
                                 <div class="admin-btn">Admin</div>
                             </div>
@@ -296,16 +296,19 @@ export default {
             return this.$store.getters.users
         },
         usersForDisplay() {
-            const users = this.$store.getters.users
+            const users = this.$store.getters.users || []
+            const members = this.board.members || []
+            const createdById = this.board.createdBy?._id
 
-            if (!this.filterByName) return users.filter(user => user._id !== this.board.createdBy._id && !this.board.members.some(member => user._id === member._id));
+            if (!this.filterByName) return users.filter(user => user._id !== createdById && !members.some(member => user._id === member._id));
             const regex = new RegExp(this.filterByName, 'i');
 
             return users.filter(user =>
-                regex.test(user.username) && user._id !== this.board.createdBy._id && !this.board.members.some(member => user._id === member._id));
+                regex.test(user.username) && user._id !== createdById && !members.some(member => user._id === member._id));
         },
         membersForDisplay() {
-            return this.board.members.filter(member => member._id !== this.board.createdBy._id)
+            const createdById = this.board.createdBy?._id
+            return (this.board.members || []).filter(member => member._id !== createdById)
         },
         loggedinUser() {
             return this.$store.getters.loggedinUser

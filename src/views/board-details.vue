@@ -217,7 +217,7 @@ export default {
     },
     computed: {
         board() {
-            return this.$store.getters.board || { groups: [], activities: [], members: [], background: '' }
+            return this.$store.getters.board || { groups: [], activities: [], members: [], background: '', createdBy: null }
         },
         cardToShow() {
             const group = this.board.groups?.[this.selectedCardGroupIdx]

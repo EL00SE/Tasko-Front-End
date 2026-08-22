@@ -3,7 +3,7 @@ import { io } from 'socket.io-client'
 // ---- Determine backend URL ----
 const BACKEND_URL =
   import.meta.env.MODE === 'production'
-    ? 'https://tasko-back-end.onrender.com'
+    ? 'https://tasko-back-end1.onrender.com'
     : 'http://localhost:3030'
 
 export const socketService = createSocketService()

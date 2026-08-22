@@ -19,7 +19,7 @@
         </section>
 
         <section
-            v-if="board && board.groups.length"
+            v-if="board"
             class="board-details-main"
             :style="{ 'backgroundColor': board.background }"
         >

@@ -49,7 +49,10 @@ export default {
         }
     },
     created() {
-        // await userService.logout()
+        // Only drop visitors into the guest account if nobody is already
+        // logged in - otherwise landing back on "/" (e.g. clicking the logo)
+        // silently clobbers a real session with the guest one.
+        if (userService.getLoggedinUser()) return
         this.$store.dispatch({ type: 'login', user: this.user })
     },
     computed: {

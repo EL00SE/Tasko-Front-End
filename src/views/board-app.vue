@@ -39,6 +39,24 @@
     </section>
 
     <section v-if="!board" class="boards-home">
+      <div class="boards-home-welcome">
+        <h1>Welcome back{{ loggedinUser?.fullname ? `, ${loggedinUser.fullname}` : "" }} 👋</h1>
+        <div class="boards-home-stats">
+          <div class="stat-tile">
+            <span class="stat-value">{{ boards.length }}</span>
+            <span class="stat-label">Boards</span>
+          </div>
+          <div class="stat-tile">
+            <span class="stat-value">{{ totalLists }}</span>
+            <span class="stat-label">Lists</span>
+          </div>
+          <div class="stat-tile">
+            <span class="stat-value">{{ totalCards }}</span>
+            <span class="stat-label">Cards</span>
+          </div>
+        </div>
+      </div>
+
       <h2>Your boards <span v-if="boards.length" class="boards-home-count">({{ boards.length }})</span></h2>
       <div class="boards-home-grid">
         <div
@@ -286,6 +304,15 @@ export default {
     boards() {
       return this.$store.getters.boards || []
     },
+    totalLists() {
+      return this.boards.reduce((sum, b) => sum + (b.groups?.length || 0), 0)
+    },
+    totalCards() {
+      return this.boards.reduce(
+        (sum, b) => sum + (b.groups?.reduce((s, g) => s + (g.cards?.length || 0), 0) || 0),
+        0
+      )
+    },
     cardToShow() {
       if (!this.board || this.selectedCardGroupIdx === null || this.selectedCardIdx === null) return null
       return this.board.groups[this.selectedCardGroupIdx].cards[this.selectedCardIdx]
@@ -323,9 +350,44 @@ export default {
 }
 .boards-home {
   padding: 32px;
+  min-height: 100vh;
+  background-color: #ebecf0;
+}
+.boards-home-welcome {
   max-width: 1200px;
+  margin-bottom: 32px;
+}
+.boards-home-welcome h1 {
+  font-size: 24px;
+  font-weight: 600;
+  color: #172b4d;
+  margin-bottom: 16px;
+}
+.boards-home-stats {
+  display: flex;
+  gap: 16px;
+}
+.stat-tile {
+  background: #fff;
+  border-radius: 8px;
+  padding: 14px 22px;
+  display: flex;
+  flex-direction: column;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.12);
+  min-width: 90px;
+}
+.stat-value {
+  font-size: 24px;
+  font-weight: 700;
+  color: #0079bf;
+}
+.stat-label {
+  font-size: 12px;
+  color: #6b7785;
+  margin-top: 2px;
 }
 .boards-home h2 {
+  max-width: 1200px;
   margin-bottom: 20px;
   font-size: 20px;
   font-weight: 600;
@@ -335,6 +397,7 @@ export default {
   color: #6b7785;
 }
 .boards-home-grid {
+  max-width: 1200px;
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
   gap: 16px;

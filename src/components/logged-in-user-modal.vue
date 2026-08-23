@@ -21,22 +21,14 @@
             <div v-if="!loggedinUser" class="user-details">Guest User</div>
         </div>
         <hr />
-        <div @click="login" v-if="!loggedinUser || loggedinUser._id === '624559a71ec4197167765f73'" class="login">Log in</div>
-        <div @click="logout" v-if="loggedinUser && loggedinUser._id !== '624559a71ec4197167765f73' " class="logout">Log out</div>
+        <div @click="login" v-if="!loggedinUser || loggedinUser.username === 'Guest-user'" class="login">Log in</div>
+        <div @click="logout" v-if="loggedinUser && loggedinUser.username !== 'Guest-user'" class="logout">Log out</div>
     </div>
 </template>
 <script>
 
 export default {
     props: {
-    },
-    data() {
-        return {
-            user: {
-                username: 'Guest-user',
-                password: '123',
-            },
-        }
     },
     computed: {
         loggedinUser() {
@@ -49,8 +41,7 @@ export default {
         },
         logout() {
             this.$emit("close");
-            // this.$store.dispatch({ type: "logout" })
-            this.$store.dispatch({ type: 'login', user: this.user })
+            this.$store.dispatch({ type: "logout" })
             this.$router.push(`/`)
         },
         login() {

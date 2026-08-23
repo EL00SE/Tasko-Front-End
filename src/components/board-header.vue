@@ -112,7 +112,7 @@
                 @remove="removeMember"
             ></remove-user-modal>
 
-            <a href="#modal1">
+            <a @click.stop.prevent="openInviteModal">
                 <div class="invite">
                     <div class="icon-sm icon-add-member"></div>
                     <a>Share</a>
@@ -120,14 +120,18 @@
             </a>
 
             <!-- invite modal start -->
-            <div v-if="loggedinUser?._id && loggedinUser._id === board.createdBy?._id" id="modal1" class="overlay">
-                <a class="cancel" href="#"></a>
+            <div
+                v-if="inviteModalOpen && loggedinUser?._id && loggedinUser._id === board.createdBy?._id"
+                class="overlay"
+                style="visibility: visible; opacity: 1;"
+            >
+                <a class="cancel" @click.stop.prevent="closeInviteModal"></a>
                 <div class="invite-modal-container">
                     <div class="invite-modal">
                         <div class="invite-modal-header">
                             <h1>Share</h1>
                             <span class="icon-lg icon-closed">
-                                <a class="cancel" href="#"></a>
+                                <a class="cancel" @click.stop.prevent="closeInviteModal"></a>
                             </span>
                         </div>
                         <div class="content">
@@ -219,6 +223,7 @@ export default {
             filterByName: null,
             pos: 0,
             currUser: '',
+            inviteModalOpen: false,
 
         }
     },
@@ -226,6 +231,12 @@ export default {
         this.$store.dispatch({ type: 'loadUsers' })
     },
     methods: {
+        openInviteModal() {
+            this.inviteModalOpen = true
+        },
+        closeInviteModal() {
+            this.inviteModalOpen = false
+        },
         setUser(member) {
             this.currUser = member
         },

@@ -39,8 +39,8 @@
     </section>
 
     <section v-if="!board" class="boards-home">
-      <h2>Your boards</h2>
-      <div v-if="boards.length" class="boards-home-grid">
+      <h2>Your boards <span v-if="boards.length" class="boards-home-count">({{ boards.length }})</span></h2>
+      <div class="boards-home-grid">
         <div
           v-for="b in boards"
           :key="b._id"
@@ -48,11 +48,29 @@
           :style="boardCardStyle(b)"
           @click="goToBoard(b)"
         >
-          <span>{{ b.title }}</span>
+          <span class="boards-home-card-title">{{ b.title }}</span>
+          <span class="boards-home-card-meta">{{ b.groups?.length || 0 }} lists</span>
+        </div>
+
+        <div v-if="!isCreatingBoard" class="boards-home-card boards-home-card-new" @click="isCreatingBoard = true">
+          <span class="icon-lg icon-add-light"></span>
+          <span>Create a board</span>
+        </div>
+        <div v-else class="boards-home-card boards-home-card-new-form" v-clickOutside="cancelNewBoard">
+          <input
+            v-focus
+            v-model="newBoardTitle"
+            placeholder="Board title..."
+            @keyup.enter="createBoardFromDashboard"
+          />
+          <div class="boards-home-card-new-form-btns">
+            <button @click="createBoardFromDashboard">Create</button>
+            <span class="icon-lg icon-close-close" @click="cancelNewBoard"></span>
+          </div>
         </div>
       </div>
-      <p v-else class="boards-home-empty">
-        You don't have any boards yet. Click <strong>Create</strong> above to make your first one.
+      <p v-if="!boards.length" class="boards-home-empty">
+        You don't have any boards yet — click the tile above to make your first one.
       </p>
     </section>
 
@@ -99,6 +117,8 @@ export default {
       groupToEdit: null,
       newGroup: boardService.getEmptyGroup(),
       newActivity: boardService.getEmptyActivity(),
+      isCreatingBoard: false,
+      newBoardTitle: '',
     }
   },
   created() {
@@ -239,8 +259,24 @@ export default {
     },
     boardCardStyle(board) {
       return board.backgroundPhoto
-        ? { backgroundImage: `url(${board.backgroundPhoto})` }
+        ? { backgroundImage: `linear-gradient(rgba(0,0,0,0.15), rgba(0,0,0,0.55)), url(${board.backgroundPhoto})` }
         : { backgroundColor: board.background || "#0079BF" }
+    },
+    cancelNewBoard() {
+      this.isCreatingBoard = false
+      this.newBoardTitle = ''
+    },
+    async createBoardFromDashboard() {
+      if (!this.newBoardTitle.trim()) return
+      const board = boardService.getEmptyBoard()
+      board.title = this.newBoardTitle.trim()
+      if (this.loggedinUser) {
+        board.createdBy = this.loggedinUser
+        board.members.push(this.loggedinUser)
+      }
+      const savedBoard = await this.$store.dispatch({ type: "saveBoard", board })
+      this.cancelNewBoard()
+      if (savedBoard?._id) this.goToBoard(savedBoard)
     },
   },
   computed: {
@@ -286,32 +322,102 @@ export default {
   flex-direction: column;
 }
 .boards-home {
-  padding: 24px;
+  padding: 32px;
+  max-width: 1200px;
 }
 .boards-home h2 {
-  margin-bottom: 16px;
-  font-size: 16px;
+  margin-bottom: 20px;
+  font-size: 20px;
+  font-weight: 600;
+}
+.boards-home-count {
+  font-weight: 400;
+  color: #6b7785;
 }
 .boards-home-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
-  gap: 12px;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 16px;
 }
 .boards-home-card {
-  height: 90px;
-  border-radius: 6px;
+  height: 130px;
+  border-radius: 8px;
   background-size: cover;
   background-position: center;
   display: flex;
-  align-items: flex-end;
-  padding: 10px;
+  flex-direction: column;
+  justify-content: flex-end;
+  padding: 12px;
   cursor: pointer;
   color: #fff;
+  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.6);
+  transition: transform 150ms ease, box-shadow 150ms ease;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.15);
+}
+.boards-home-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.2);
+}
+.boards-home-card-title {
+  font-weight: 700;
+  font-size: 15px;
+  line-height: 1.3;
+}
+.boards-home-card-meta {
+  font-size: 12px;
+  opacity: 0.85;
+  margin-top: 4px;
+}
+.boards-home-card-new {
+  background-color: #f5f6f8;
+  color: #44546f;
+  text-shadow: none;
+  align-items: center;
+  justify-content: center;
+  flex-direction: row;
+  gap: 8px;
+  border: 2px dashed #dcdfe4;
+  box-shadow: none;
   font-weight: 600;
-  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);
+}
+.boards-home-card-new:hover {
+  background-color: #ebecf0;
+  transform: none;
+  box-shadow: none;
+}
+.boards-home-card-new-form {
+  background-color: #fff;
+  border: 1px solid #dcdfe4;
+  color: #172b4d;
+  text-shadow: none;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.15);
+  justify-content: flex-start;
+  gap: 8px;
+}
+.boards-home-card-new-form input {
+  border: 1px solid #dcdfe4;
+  border-radius: 4px;
+  padding: 8px;
+  font-size: 14px;
+  width: 100%;
+}
+.boards-home-card-new-form-btns {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.boards-home-card-new-form-btns button {
+  background-color: #0079bf;
+  color: #fff;
+  border: none;
+  border-radius: 4px;
+  padding: 6px 12px;
+  cursor: pointer;
+  font-weight: 600;
 }
 .boards-home-empty {
   color: #6b7785;
+  margin-top: 16px;
 }
 .dialog-container {
   position: fixed;

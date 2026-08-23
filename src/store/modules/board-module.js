@@ -163,6 +163,7 @@ export default {
                     type: 'saveBoard',
                     board: savedBoard
                 });
+                return savedBoard
             } catch (err) {
                 console.log('sorry user cannot do that!!!');
             }

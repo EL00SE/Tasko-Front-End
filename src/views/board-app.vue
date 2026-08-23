@@ -101,6 +101,13 @@ export default {
       newActivity: boardService.getEmptyActivity(),
     }
   },
+  created() {
+    // This view only ever renders for the paramless /board route - any
+    // board left over in the store from a previous /board/:boardId visit
+    // is stale here and would otherwise make this look like the same
+    // board instead of the boards dashboard.
+    this.$store.commit({ type: "setBoard", board: null })
+  },
   mounted() {
     socketService.on("board-changed", this.socketBoardUpdate)
   },

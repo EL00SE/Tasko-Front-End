@@ -8,7 +8,7 @@
                 <p>Tasko</p>
             </div>
             <div>
-                <a @click="goTologin" href="#">Log in</a>
+                <a @click.stop.prevent="goTologin" href="#">Log in</a>
                 <button @click="goToSignup">Sign up</button>
             </div>
         </nav>

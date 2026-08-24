@@ -11,11 +11,8 @@ A full-stack Trello clone — boards, lists, cards, drag-and-drop, real-time syn
 
 **[→ tasko-front-end.vercel.app](https://tasko-front-end.vercel.app)** — click **"Let's start"** to explore instantly as a guest, no signup needed. Comes pre-loaded with several sample boards (travel planning, a workout tracker, a product roadmap, etc.) so there's real content to look at immediately.
 
-<!--
-Add 2-3 screenshots here, e.g.:
 ![Dashboard](./docs/screenshot-dashboard.png)
 ![Board view](./docs/screenshot-board.png)
--->
 
 ## Features
 

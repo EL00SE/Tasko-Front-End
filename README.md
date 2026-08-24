@@ -1,19 +1,27 @@
 # Tasko
 
-A full-stack Trello clone — boards, lists, cards, drag-and-drop, real-time sync via WebSockets, and session-based auth with a guest mode for demos.
+A full-stack Trello clone — boards, lists, cards, drag-and-drop, real-time sync over WebSockets, and session-based auth with a one-click guest mode for demos.
 
-**Live demo:** https://tasko-front-end.vercel.app *(click "Let's start" to explore instantly as a guest — no signup needed)*
+[![Live Demo](https://img.shields.io/badge/demo-live-brightgreen?style=flat-square)](https://tasko-front-end.vercel.app)
+[![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg?style=flat-square)](./LICENSE)
+![Vue 3](https://img.shields.io/badge/Vue-3-4FC08D?style=flat-square&logo=vuedotjs&logoColor=white)
+![Vite](https://img.shields.io/badge/Vite-B73BFE?style=flat-square&logo=vite&logoColor=white)
+![Socket.IO](https://img.shields.io/badge/Socket.IO-black?style=flat-square&logo=socketdotio)
+![Vercel](https://img.shields.io/badge/Vercel-black?style=flat-square&logo=vercel)
+
+**[→ tasko-front-end.vercel.app](https://tasko-front-end.vercel.app)** — click **"Let's start"** to explore instantly as a guest, no signup needed. Comes pre-loaded with several sample boards (travel planning, a workout tracker, a product roadmap, etc.) so there's real content to look at immediately.
 
 <!--
-Add 2-3 screenshots here once you have them, e.g.:
-![Home page](./docs/screenshot-home.png)
+Add 2-3 screenshots here, e.g.:
+![Dashboard](./docs/screenshot-dashboard.png)
 ![Board view](./docs/screenshot-board.png)
 -->
 
 ## Features
 
 - Create boards, lists, and cards with full drag-and-drop reordering
-- Labels, checklists, due dates, and card descriptions
+- Labels, checklists, due dates, card descriptions, and photo covers
+- A dashboard showing all your boards with live stats (board/list/card counts)
 - Real-time board updates across sessions via Socket.IO
 - Session-based auth (signup/login) plus a one-click guest mode
 - Responsive Vue 3 + Vite frontend, Express/MongoDB backend
@@ -40,7 +48,7 @@ npm install
 npm run dev        # starts Vite dev server against localhost:3030
 ```
 
-By default it talks to the backend at `http://localhost:3030` — see [Tasko-back-End](https://github.com/EL00SE/Tasko-back-End) to run that locally too, or just point `src/services/http.service.js` / `socket.service.js` at the deployed Render backend.
+By default it talks to the backend at `http://localhost:3030` — see [Tasko-back-End](https://github.com/EL00SE/Tasko-back-End) to run that locally too, or point `src/services/http.service.js` / `socket.service.js` at the deployed Render backend instead.
 
 ```sh
 npm run build       # production build to dist/
@@ -49,5 +57,9 @@ npm run test:unit   # Vitest
 
 ## Roadmap
 
-- A proper "browse all boards" landing view (currently shows your own boards; a dedicated template gallery is scaffolded but not fully wired up)
 - Code-split the main bundle (currently a single ~1.5MB chunk)
+- A "recently viewed" / "starred boards" section on the dashboard, backed by real view-tracking
+
+## License
+
+[MIT](./LICENSE)

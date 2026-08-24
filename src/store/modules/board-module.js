@@ -15,6 +15,9 @@ export default {
         loggedinUser: userService.getLoggedinUser()
     },
     getters: {
+        boardsLoading(state) {
+            return state.boards === null
+        },
         board(state) {
             return state.selectedBoard
         },
@@ -111,9 +114,15 @@ export default {
                 const boards = await boardService.query()
                 commit({
                     type: 'setBoards',
-                    boards
+                    boards: boards || []
                 });
             } catch (err) {
+                // Fall back to an empty list so the UI can stop showing a
+                // loading state - without this, a genuine failure (as
+                // opposed to just a slow cold-start response) would leave
+                // the dashboard spinning forever instead of showing the
+                // empty state.
+                commit({ type: 'setBoards', boards: [] })
                 console.log('err');
             }
         },

@@ -58,38 +58,47 @@
       </div>
 
       <h2>Your boards <span v-if="boards.length" class="boards-home-count">({{ boards.length }})</span></h2>
-      <div class="boards-home-grid">
-        <div
-          v-for="b in boards"
-          :key="b._id"
-          class="boards-home-card"
-          :style="boardCardStyle(b)"
-          @click="goToBoard(b)"
-        >
-          <span class="boards-home-card-title">{{ b.title }}</span>
-          <span class="boards-home-card-meta">{{ b.groups?.length || 0 }} lists</span>
-        </div>
 
-        <div v-if="!isCreatingBoard" class="boards-home-card boards-home-card-new" @click="isCreatingBoard = true">
-          <span class="icon-lg icon-add-light"></span>
-          <span>Create a board</span>
-        </div>
-        <div v-else class="boards-home-card boards-home-card-new-form" v-clickOutside="cancelNewBoard">
-          <input
-            v-focus
-            v-model="newBoardTitle"
-            placeholder="Board title..."
-            @keyup.enter="createBoardFromDashboard"
-          />
-          <div class="boards-home-card-new-form-btns">
-            <button @click="createBoardFromDashboard">Create</button>
-            <span class="icon-lg icon-close-close" @click="cancelNewBoard"></span>
+      <div v-if="boardsLoading" class="boards-home-loading">
+        <div class="boards-home-spinner"></div>
+        <span>Loading your boards…</span>
+        <span class="boards-home-loading-hint">The backend can take a few seconds to wake up on the first visit.</span>
+      </div>
+
+      <template v-else>
+        <div class="boards-home-grid">
+          <div
+            v-for="b in boards"
+            :key="b._id"
+            class="boards-home-card"
+            :style="boardCardStyle(b)"
+            @click="goToBoard(b)"
+          >
+            <span class="boards-home-card-title">{{ b.title }}</span>
+            <span class="boards-home-card-meta">{{ b.groups?.length || 0 }} lists</span>
+          </div>
+
+          <div v-if="!isCreatingBoard" class="boards-home-card boards-home-card-new" @click="isCreatingBoard = true">
+            <span class="icon-lg icon-add-light"></span>
+            <span>Create a board</span>
+          </div>
+          <div v-else class="boards-home-card boards-home-card-new-form" v-clickOutside="cancelNewBoard">
+            <input
+              v-focus
+              v-model="newBoardTitle"
+              placeholder="Board title..."
+              @keyup.enter="createBoardFromDashboard"
+            />
+            <div class="boards-home-card-new-form-btns">
+              <button @click="createBoardFromDashboard">Create</button>
+              <span class="icon-lg icon-close-close" @click="cancelNewBoard"></span>
+            </div>
           </div>
         </div>
-      </div>
-      <p v-if="!boards.length" class="boards-home-empty">
-        You don't have any boards yet — click the tile above to make your first one.
-      </p>
+        <p v-if="!boards.length" class="boards-home-empty">
+          You don't have any boards yet — click the tile above to make your first one.
+        </p>
+      </template>
     </section>
 
     <section v-if="isCardOpen" class="dialog-container card-details-scroll">
@@ -304,6 +313,9 @@ export default {
     boards() {
       return this.$store.getters.boards || []
     },
+    boardsLoading() {
+      return this.$store.getters.boardsLoading
+    },
     totalLists() {
       return this.boards.reduce((sum, b) => sum + (b.groups?.length || 0), 0)
     },
@@ -481,6 +493,33 @@ export default {
 .boards-home-empty {
   color: #6b7785;
   margin-top: 16px;
+}
+.boards-home-loading {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  padding: 48px 0;
+  color: #44546f;
+  font-weight: 600;
+}
+.boards-home-loading-hint {
+  font-weight: 400;
+  font-size: 13px;
+  color: #6b7785;
+}
+.boards-home-spinner {
+  width: 28px;
+  height: 28px;
+  border: 3px solid #dcdfe4;
+  border-top-color: #0079bf;
+  border-radius: 50%;
+  animation: boards-home-spin 800ms linear infinite;
+}
+@keyframes boards-home-spin {
+  to {
+    transform: rotate(360deg);
+  }
 }
 .dialog-container {
   position: fixed;

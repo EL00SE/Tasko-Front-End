@@ -5,14 +5,6 @@
     display: flex;
     align-items: center;
     color: $memberBlue;
-    .group-drag-handle {
-        cursor: grab;
-        color: #a0a6ac;
-        margin-right: 6px;
-        flex-shrink: 0;
-        user-select: none;
-        line-height: 1;
-    }
     p {
         font-family: Segoe UI, Tahoma, Geneva, Verdana, sans-serif;
         color: $memberBlue;

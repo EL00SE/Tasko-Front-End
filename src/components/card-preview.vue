@@ -117,7 +117,6 @@
 </template>
 <script>
 import { boardService } from "../services/board.service.js";
-import { Container, Draggable } from "vue3-smooth-dnd";
 import { applyDrag, generateItems } from '../services/dnd.service.js';
 import labelModal from "./label-modal-cmp.vue";
 import membersModal from "./memebers-modal-cmp.vue";
@@ -146,8 +145,6 @@ export default {
         },
     },
     components: {
-        Container,
-        Draggable,
         labelModal,
         membersModal,
         datesModal,

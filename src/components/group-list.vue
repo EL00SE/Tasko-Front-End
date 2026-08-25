@@ -1,19 +1,19 @@
 <!-- card preview inside group list -->
 <template >
     <section>
-        <Container
+        <draggable
             class="group-list-main scroll-groups"
-            orientation="horizontal"
-            @drop="onGroupDrop($event)"
-            drag-handle-selector=".group-preview-main"
+            :list="boardToEdit.groups"
+            item-key="id"
+            handle=".toggle-input"
+            drag-class="tilt"
+            :delay="150"
+            :delay-on-touch-only="true"
+            :force-fallback="true"
+            @end="onGroupDrop"
         >
-            <!-- group -->
-            <Draggable
-                v-for="group in board.groups"
-                :key="group"
-                class="group-preview-main cursor-pointer"
-                drag-class="tilt"
-            >
+            <template #item="{ element: group }">
+                <div class="group-preview-main cursor-pointer">
                     <div>
                 <div class="group-preview">
                         <!-- title -->
@@ -26,15 +26,18 @@
                         ></toggle-input-cmp>
                         <!-- card-list -->
 
-                        <Container
+                        <draggable
                             class="scroller-group"
+                            :list="group.cards"
+                            item-key="id"
+                            group="cards"
                             drag-class="tilt"
-                            group-name="col"
-                            orientation="vertical"
-                            :get-child-payload="getCardPayload(group.id)"
-                            @drop="(e) => onCardDrop(group.id, e)"
+                            :delay="150"
+                            :delay-on-touch-only="true"
+                            :force-fallback="true"
+                            @end="() => onCardDrop(group.id)"
                         >
-                            <Draggable v-for="card in group.cards" :key="card.id">
+                            <template #item="{ element: card }">
                                 <card-preview
                                     @copyCardToGroup="CopyNewCard"
                                     @toggleQuickEdit="openMiniEdit"
@@ -48,24 +51,25 @@
                                     :board="board"
                                     :isLabelOpen="isLabelOpen"
                                 ></card-preview>
-                            </Draggable>
-                            <div
-                                v-if="isAddingCard && groupToEdit.id === group.id"
-                                v-clickOutside="saveNewCardAndClose"
-                                class="add-new-card-input"
-                            >
-                                <div class="txt-box">
-                                    <textarea
-                                        v-focus
-                                        @keydown.enter.stop.prevent="saveNewCard(group)"
-                                        placeholder="Enter a title for this card..."
-                                        type="text"
-                                        v-model="newCard.title"
-                                    />
+                            </template>
+                            <template #footer>
+                                <div
+                                    v-if="isAddingCard && groupToEdit.id === group.id"
+                                    v-clickOutside="saveNewCardAndClose"
+                                    class="add-new-card-input"
+                                >
+                                    <div class="txt-box">
+                                        <textarea
+                                            v-focus
+                                            @keydown.enter.stop.prevent="saveNewCard(group)"
+                                            placeholder="Enter a title for this card..."
+                                            type="text"
+                                            v-model="newCard.title"
+                                        />
+                                    </div>
                                 </div>
-                            </div>
-                            <!-- add-card-btn -->
-                        </Container>
+                            </template>
+                        </draggable>
                     <section class="add-card-cmp">
                         <button
                             class="btn-add-card-out"
@@ -83,27 +87,29 @@
                     </section>
                     </div>
                 </div>
-            </Draggable>
-            <!-- end -->
+                </div>
+            </template>
 
-            <div class="add-new-group" :style="show ? { 'height': '100px' } : null">
-                <button class="add-another-list-btn" v-if="!show" @click="show = true">
-                    <span class="icon-sm icon-add-light"></span>Add another list
-                </button>
-                <div v-clickOutside="close" v-if="show" class="add-new-group-in">
-                    <textarea
-                        @keyup.enter="addNewGroup"
-                        placeholder="Enter list title..."
-                        type="text"
-                        v-model="newGroup.title"
-                    />
-                    <div class="controls-add-list">
-                        <button class="btn-add-card-in" @click="addNewGroup">Add List</button>
-                        <span class="icon-lg icon-close-close" @click="show = false"></span>
+            <template #footer>
+                <div class="add-new-group" :style="show ? { 'height': '100px' } : null">
+                    <button class="add-another-list-btn" v-if="!show" @click="show = true">
+                        <span class="icon-sm icon-add-light"></span>Add another list
+                    </button>
+                    <div v-clickOutside="close" v-if="show" class="add-new-group-in">
+                        <textarea
+                            @keyup.enter="addNewGroup"
+                            placeholder="Enter list title..."
+                            type="text"
+                            v-model="newGroup.title"
+                        />
+                        <div class="controls-add-list">
+                            <button class="btn-add-card-in" @click="addNewGroup">Add List</button>
+                            <span class="icon-lg icon-close-close" @click="show = false"></span>
+                        </div>
                     </div>
                 </div>
-            </div>
-        </Container>
+            </template>
+        </draggable>
 
         <section
             @click.stop.prevent="closeModal"
@@ -288,8 +294,7 @@ import deleteWarning from "./delete-warning-modal-cmp.vue";
 import coverModal from "./cover-modal-cmp.vue";
 import copyModal from "./copy-modal-cmp.vue";
 import { uploadService } from "../services/upload.service.js"
-import { Container, Draggable } from "vue3-smooth-dnd";
-import { applyDrag, generateItems } from '../services/dnd.service.js'
+import draggable from "vuedraggable";
 import { boardService } from '../services/board.service.js';
 
 export default {
@@ -297,8 +302,7 @@ export default {
     components: {
         cardPreview,
         toggleInputCmp,
-        Container,
-        Draggable,
+        draggable,
         labelModal,
         membersModal,
         datesModal,
@@ -518,24 +522,16 @@ export default {
         addNewGroup() {
             this.$emit('addGroup', this.newGroup)
         },
-        onGroupDrop(dropResult) {
-            this.boardToEdit.groups = applyDrag(this.boardToEdit.groups, dropResult)
+        onGroupDrop() {
+            // vuedraggable (SortableJS) already spliced boardToEdit.groups
+            // in place - just persist the already-reordered result.
             this.$emit('groupDnd', this.boardToEdit)
         },
-        onCardDrop(groupId, dropResult) {
-            if (dropResult.removedIndex !== null || dropResult.addedIndex !== null) {
-                const newGroup = this.boardToEdit.groups.filter(p => p.id === groupId)[0]
-                const groupIndex = this.boardToEdit.groups.indexOf(newGroup)
-                const newColumn = JSON.parse(JSON.stringify(newGroup))
-                newColumn.cards = applyDrag(newColumn.cards, dropResult)
-                this.boardToEdit.groups.splice(groupIndex, 1, newColumn)
-                this.$emit('groupDnd', this.boardToEdit)
-            }
-        },
-        getCardPayload(groupId) {
-            return index => {
-                return this.boardToEdit.groups.filter(p => p.id === groupId)[0].cards[index]
-            }
+        onCardDrop() {
+            // Same here: group.cards (a nested array inside boardToEdit)
+            // was already spliced/moved in place, including moves between
+            // different lists since both share group="cards".
+            this.$emit('groupDnd', this.boardToEdit)
         },
         closeAdder(){
             this.isAddingCard = false

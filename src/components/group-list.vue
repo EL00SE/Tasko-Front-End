@@ -7,9 +7,9 @@
             item-key="id"
             handle=".toggle-input"
             drag-class="tilt"
-            :delay="150"
+            :delay="500"
             :delay-on-touch-only="true"
-            :force-fallback="true"
+            :touch-start-threshold="3"
             @end="onGroupDrop"
         >
             <template #item="{ element: group }">
@@ -32,9 +32,9 @@
                             item-key="id"
                             group="cards"
                             drag-class="tilt"
-                            :delay="150"
+                            :delay="500"
                             :delay-on-touch-only="true"
-                            :force-fallback="true"
+                            :touch-start-threshold="3"
                             @end="() => onCardDrop(group.id)"
                         >
                             <template #item="{ element: card }">

@@ -5,7 +5,7 @@
             class="group-list-main scroll-groups"
             orientation="horizontal"
             @drop="onGroupDrop($event)"
-            drag-handle-selector=".group-preview-main"
+            drag-handle-selector=".toggle-input"
         >
             <!-- group -->
             <Draggable

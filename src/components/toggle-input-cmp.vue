@@ -1,5 +1,6 @@
 <template>
     <section class="toggle-input">
+        <span class="group-drag-handle" aria-hidden="true">⠿</span>
         <p v-if="!titleIsOpen" class="group-title cursor-pointer" @click.stop.prevent="openTitleEdit">{{ txt }}</p>
         <input
             v-focus

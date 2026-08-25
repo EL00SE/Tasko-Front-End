@@ -170,6 +170,23 @@
 
 //////////////////// Board Page //////////////////////////
 
+// html, .app-main, and .board-details-main all set overflow-y: hidden
+// unconditionally (see _base.scss / _layout.scss / _board-app.scss),
+// relying on nested elements like .scroller-group for all vertical
+// scrolling. That's a reasonable desktop pattern (mouse + cursor makes
+// targeting a specific scroll region easy) but on a touchscreen users
+// naturally try to scroll the whole page as a fallback, and here that's
+// hard-blocked with no recovery - it just doesn't respond. Let the page
+// itself scroll on mobile so that fallback actually works, without
+// touching the fixed-viewport desktop layout.
+@media screen and (max-width: 767px) {
+    html,
+    .app-main,
+    .board-details-main {
+        overflow-y: auto !important;
+    }
+}
+
 @media screen and (max-width: 767px) {
     .board-app-main {
         padding: 0;

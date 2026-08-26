@@ -348,14 +348,36 @@ export default {
             },
             timeCalc: null,
             newCard: {},
-            isAddingCard: false
+            isAddingCard: false,
+            // Backs boardToEdit. A plain computed that re-clones this.board
+            // on every access looks harmless, but vuedraggable/SortableJS
+            // keeps its own internal tracking of whatever array is bound to
+            // :list outside Vue's reactivity - handing it a brand-new clone
+            // (even with identical content) right after a drag, which is
+            // exactly what happens because @end synchronously emits the
+            // edited board and the parent's save round-trip updates the
+            // board prop, desyncs that internal state and breaks further
+            // touch input. Only replacing this when the content actually
+            // changed keeps the same array reference stable across a
+            // drag's own save round-trip.
+            localBoardToEdit: null,
         };
     },
     created() {
+        this.localBoardToEdit = JSON.parse(JSON.stringify(this.board))
+    },
+    watch: {
+        board: {
+            handler(newBoard) {
+                if (JSON.stringify(newBoard) !== JSON.stringify(this.localBoardToEdit)) {
+                    this.localBoardToEdit = JSON.parse(JSON.stringify(newBoard))
+                }
+            },
+        },
     },
     computed: {
         boardToEdit() {
-            return JSON.parse(JSON.stringify(this.board))
+            return this.localBoardToEdit
         },
         pointerEvents() {
             return this.isQuickEditOpen

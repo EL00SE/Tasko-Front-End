@@ -170,6 +170,24 @@
 
 //////////////////// Board Page //////////////////////////
 
+// html and .app-main set overflow-y: hidden unconditionally (see
+// _base.scss / _layout.scss), so on mobile there's no page-level
+// scroll fallback anywhere in the app - including on the dashboard
+// (board-app.vue's boards-home section), which has no drag-and-drop
+// elements at all and so can't be affected by anything below.
+// .board-details-main (the actual board view, with drag-and-drop
+// lists/cards) is deliberately NOT included here - that view now has
+// its own properly-configured drag-vs-scroll disambiguation
+// (delay + touchStartThreshold on the vuedraggable/Sortable
+// instances), and giving it a second, competing page-level scroll
+// path caused a real regression last time this was tried.
+@media screen and (max-width: 767px) {
+    html,
+    .app-main {
+        overflow-y: auto !important;
+    }
+}
+
 @media screen and (max-width: 767px) {
     .board-app-main {
         padding: 0;
